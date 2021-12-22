@@ -5,12 +5,12 @@ from helpers import read_meta_data
 from selenium import webdriver
 
 class WoolyScraper():
-    def __init__(self):
+    def __init__(self, url):
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('headless')
         self.driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
         self.data = read_meta_data("meta_data.json")
-        self.url = "https://www.wollplatz.de/wolle/herstellers"  # start url
+        self.url = url
 
     def __del__(self):
         self.driver.close()
@@ -23,7 +23,7 @@ class WoolyScraper():
 
     def start_parsing(self):
         soup = self.get_page(self.url)
-        # This is function parse the brands page to find the url for each qurey brand provided in the data object
+        # This is function pa rse the brands page to find the url for each qurey brand provided in the data object
         PRODUCT_BRAND_SELECTOR = ".productlistholder"
         for brand in soup.select(PRODUCT_BRAND_SELECTOR):
             PRODUCT_BRAND_TITLE_SELECTOR = ".productlist-imgholder"
@@ -81,5 +81,14 @@ class WoolyScraper():
         }
 
 
-scraper = WoolyScraper()
+scraper = WoolyScraper("https://www.wollplatz.de/wolle/herstellers")
 scraper.start_parsing()
+
+
+#TODOS
+# 1- Add command line argument
+# 2- Save data to database
+# 3- Add logging system
+# 4- Update the readmefile
+# 5- Add tests
+# 6- Add comments to functions
