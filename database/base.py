@@ -3,7 +3,5 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine("sqlite:///wooly.db")
-
 Session = sessionmaker(bind=engine)
-
 Base = declarative_base()
