@@ -6,7 +6,6 @@ from database.product import Product
 from helpers import read_meta_data
 
 
-
 class WoolyScraper():
     def __init__(self, url, driver, session):
         self.driver = driver
@@ -27,25 +26,41 @@ class WoolyScraper():
 
     def start_parsing(self):
         soup = self.get_page(self.url)
-        # This is function pa rse the brands page to find the url for each qurey brand provided in the data object
+
+        brand_found = False
         PRODUCT_BRAND_SELECTOR = ".productlistholder"
-        for brand in soup.select(PRODUCT_BRAND_SELECTOR):
-            PRODUCT_BRAND_TITLE_SELECTOR = ".productlist-imgholder"
-            for product_brand in brand.select(PRODUCT_BRAND_TITLE_SELECTOR):
+        for query_brand_title in self.input_data.keys():
+            for brand in soup.select(PRODUCT_BRAND_SELECTOR):
+                PRODUCT_BRAND_TITLE_SELECTOR = ".productlist-imgholder"
+                product_brand = brand.select_one(PRODUCT_BRAND_TITLE_SELECTOR)
                 brand_title = product_brand["title"]
                 brand_url = product_brand["href"]
-                for query_brand_title in self.input_data.keys():
-                    if brand_title == query_brand_title:
-                        for query_name in self.input_data[brand_title]:
-                            self.url = brand_url
-                            self.url = self.url + "?page=" + str(1)
-                            product_url = self.parse_products_page(self.get_page(self.url), query_name)
-                            if product_url:
-                                self.url = product_url
-                                product = self.parse_element_page(self.get_page(self.url))
-                                self.session.add(product)  # Add product to the database
-                            else:
-                                print("Element not found " + query_name)
+
+                # First search for the brand
+                if brand_title == query_brand_title:
+                    brand_found = True
+                    for query_name in self.input_data[brand_title]:
+                        self.url = brand_url
+                        self.url = self.url + "?page=" + str(1)
+
+                        # Second search for product in the brand's products page
+                        product_url = self.parse_products_page(self.get_page(self.url), query_name)
+                        if product_url:
+                            self.url = product_url
+
+                            # Third get the product details
+                            product = self.parse_element_page(self.get_page(self.url))
+
+                            # Finally add it to the database
+                            self.session.add(product)
+                        else:
+                            print("Product not found :", query_brand_title, query_name)
+
+            if not brand_found:
+                print("brand not found :", query_brand_title)
+
+            # Reset
+            brand_found = False
 
         self.session.commit()
 
@@ -53,12 +68,12 @@ class WoolyScraper():
         PRODUCT_SELECTOR = ".productlistholder"
         for product in response.select(PRODUCT_SELECTOR):
             PRODUCT_TITLE_SELECTOR = ".productlist-imgholder"
-            for product_title in product.select(PRODUCT_TITLE_SELECTOR):
-                product_brand = product_title["title"].split(' ', 1)[0]  # extract the brand name from the product name
-                product_name = product_title["title"].split(' ', 1)[1]  # drop the brand name from the product name
-                product_url = product_title["href"]
-                if product_name == query_name:
-                    return product_url
+            product_title = product.select_one(PRODUCT_TITLE_SELECTOR)
+            product_brand = product_title["title"].split(' ', 1)[0]  # extract the brand name from the product name
+            product_name = product_title["title"].split(' ', 1)[1]  # drop the brand name from the product name
+            product_url = product_title["href"]
+            if product_name == query_name:
+                return product_url
 
         # In case that the element that we are searching for is not found
         NEXT_BUTTON_SELECTOR = "li[class=paging-volgende]"
