@@ -3,7 +3,7 @@ import logging
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
-from WoolyScraper import WoolyScraper
+from wooly_scraper import WoolyScraper
 from database.base import Base, engine, Session
 
 # Initialize the driver
