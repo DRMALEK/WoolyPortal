@@ -104,6 +104,6 @@ class WoolyScraper():
                           price=product_price,
                           composition=product_composition,
                           needle_size=product_needle_size,
-                          deliver_time=None)
+                          deliver_time=None) # None, since there is no such field on the website
 
         return product
