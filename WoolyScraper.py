@@ -7,11 +7,10 @@ from helpers import read_meta_data
 
 
 class WoolyScraper():
-    def __init__(self, url, driver, session):
+    def __init__(self, driver, session, path):
         self.driver = driver
-        self.input_data = read_meta_data("meta_data.json")  # Meta data about what to scrape
-        self.url = url
-        self.output_data = []  # The data that have be scraped
+        self.input_data = read_meta_data(path)  # Meta data about what to scrape
+        self.url = "https://www.wollplatz.de/wolle/herstellers"
         self.session = session
 
     def __del__(self):
@@ -57,7 +56,7 @@ class WoolyScraper():
                             print("Product not found :", query_brand_title, query_name)
 
             if not brand_found:
-                print("brand not found :", query_brand_title)
+                print("Brand not found :", query_brand_title)
 
             # Reset
             brand_found = False
@@ -90,13 +89,8 @@ class WoolyScraper():
 
         product_title = response.select_one(PRODUCT_TITLE_SELECTOR).text \
             if response.select(PRODUCT_TITLE_SELECTOR) else ""
-
-        if len(product_title) > 1:
-            product_brand_name = product_title.split(" ", 1)[0]
-            product_name = product_title.split(" ", 1)[1]
-        else:
-            product_brand_name = ""
-            product_name = ""
+        product_brand_name = product_title.split(" ", 1)[0]
+        product_name = product_title.split(" ", 1)[1]
 
         product_price = response.select_one(PRODUCT_PRICE_SELECTOR).text \
             if response.select(PRODUCT_PRICE_SELECTOR) else ""

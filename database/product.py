@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import Column, String, Integer, Date
 from database.base import Base
 
@@ -11,7 +13,10 @@ class Product(Base):
     price = Column("price", String)  # In Euro
     composition = Column("composition", String)
     needle_size = Column("needle_size", String)  # In m.m
-    deliver_time = Column("Delivery_time", Date)
+    deliver_time = Column("delivery_time", Date)
+    creation_time = Column("creation_time", Date, default=datetime.datetime.utcnow())
+    last_update = Column("last_update", Date, default=datetime.datetime.utcnow())
+
 
     def __init__(self, name, brand, price, composition, needle_size, deliver_time):
         self.name = name

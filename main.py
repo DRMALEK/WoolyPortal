@@ -3,7 +3,7 @@ import logging
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
-from scraper_selenium import WoolyScraper
+from WoolyScraper import WoolyScraper
 from database.base import Base, engine, Session
 
 # Initialize the driver
@@ -20,12 +20,5 @@ session = Session()
 
 # Start Scraping !
 print("Start scrapping ...")
-scraper = WoolyScraper("https://www.wollplatz.de/wolle/herstellers", driver, session)
+scraper = WoolyScraper(driver, session, "meta_data.json")
 scraper.start_parsing()
-
-#TODOS
-# 1- Add tests
-# 3- Add logging system
-# 4- Update the readmefile
-# 5- Add tests
-# 6- Add comments to functions
